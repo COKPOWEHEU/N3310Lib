@@ -1,16 +1,6 @@
 Это драйвер для графического LCD от Nokia 3310, а также его китайских клонов. Базируется на коде библиотек написанных Sylvain Bissonnette - http://www.microsyl.com/index.php/2010/03/24/nokia-lcd-library/ и Fandi Gunawan - http://fandigunawan.wordpress.com/2008/06/18/lcd-nokia-3310-pcd8544-driver-in-winavravr-gcc/
 Основные отличия между оригиналом и клоном хорошо описаны в статье от Aheir - http://radiokot.ru/articles/29/
 Ещё один метод подключения от Sicorski - http://we.easyelectronics.ru/HomeTech/esche-odin-metod-podklyucheniya-lcd-ot-nokia-3310.html
-
-Xander Gresolio <xugres@gmail.com>
 http://we.easyelectronics.ru/lcd_gfx/biblioteka-dlya-raboty-s-displeem-nokia-3310.html
 
-История
-Версия 1.0 (06.08.2011)
-+ Первая версия
-+ Добавлена поддержка китайских клонов LCD Nokia 3310
-+ Полный перевод комментариев к исходному коду драйвера
-+ Таблица символов драйвера дополнена кириллицей (упрощенная Windows-1251)
-+ Добавлена функция рисования окружностей LcdCircle
-- Исправлены ошибки в проверке корректности координат при вызове функций рисования
-- Исправлена ошибка в функции LcdSingleBar (неверная отрисовка по y)
+Nokia 3310 / 5110 LCD driver for AVR. This library is fork of https://github.com/gresolio/N3310Lib
