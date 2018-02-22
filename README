@@ -2,5 +2,6 @@
 Основные отличия между оригиналом и клоном хорошо описаны в статье от Aheir - http://radiokot.ru/articles/29/
 Ещё один метод подключения от Sicorski - http://we.easyelectronics.ru/HomeTech/esche-odin-metod-podklyucheniya-lcd-ot-nokia-3310.html
 http://we.easyelectronics.ru/lcd_gfx/biblioteka-dlya-raboty-s-displeem-nokia-3310.html
+(оригинал, откуда сфоркано, не обновлялся 5 лет)
 
 Nokia 3310 / 5110 LCD driver for AVR. This library is fork of https://github.com/gresolio/N3310Lib
