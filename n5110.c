@@ -17,6 +17,20 @@
 PROGMEM const uint8_t glyph[][5] = {
   #include "lcd_chars.inc"
 };
+#ifdef LCD_FONT3x5
+PROGMEM const uint8_t glyph3x5[][3]={
+  {0b11111, 0b10001, 0b11111}, //0
+  {0b00000, 0b00000, 0b11111}, //1
+  {0b11101, 0b10101, 0b10111}, //2
+  {0b10101, 0b10101, 0b11111}, //3
+  {0b00111, 0b00100, 0b11111}, //4
+  {0b10111, 0b10101, 0b11101}, //5
+  {0b11111, 0b10101, 0b11101}, //6
+  {0b00001, 0b00001, 0b11111}, //7
+  {0b11111, 0b10101, 0b11111}, //8
+  {0b10111, 0b10101, 0b11111}  //9
+};
+#endif
 
 PROGMEM const uint8_t bitmask[8]={0x01,0x02,0x04,0x08,0x10,0x20,0x40,0x80};
 PROGMEM const float exp_data[]={1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000};
@@ -31,6 +45,7 @@ uint8_t  lcd_videobuf[ LCD_VIDEO_SIZE ];
 //current "cursor" position on screen
 int   LcdCacheIdx;
 volatile unsigned char lcd_fontsize=1;
+volatile unsigned char lcdtfdn = 0;
 
 #ifdef LCD_DIRECT
 //в direct-режиме отслеживается измененная область экрана
@@ -146,6 +161,28 @@ int8_t LcdGotoXY( uint8_t x, uint8_t y ){
   LcdCacheIdx = x * 6 + y * 84;
   return LCD_OK;
 }
+//////////////////////////////////////////////////////////////////////////////
+/* Name         :  LcdGotoAbs
+ * Description  :  sets "cursor" to absolute position (x,y)
+ * Argument(s)  :  x,y - position
+ * Return value :  -
+ */
+/* Имя                   :  LcdGotoAbs
+ * Описание              :  Устанавливает курсор в позицию x,y относительно стандартного размера шрифта
+ * Аргумент(ы)           :  x,y -> координаты новой позиции курсора
+ * Возвращаемое значение :  -
+ */
+int8_t LcdGotoAbs(uint8_t x, uint8_t y){
+  // Защита от выхода за пределы
+  if ( x >= LCD_X_RES || y >= LCD_Y_RES) return LCD_OUT;
+  // Пересчет индекса и смещения
+#ifdef LCD_FONT3x5
+  lcdtfdn = (y & 0x03);
+#endif
+  y = (y>>1)&~0x03; //index = (y / 8)*2
+  LcdCacheIdx = (y<<4) + (y<<2) + y + x; //index = ( ( y / 8 ) * 84 ) + x;
+  return LCD_OK;
+}
 ////////////////////////////////////////////////////////////////////////////////
 /* Name         :  LcdChr
  * Description  :  output 1 character to "cursor" position and increment it
@@ -168,15 +205,35 @@ int8_t LcdChr( char ch ){
     else if ( ch >= 0xC0 )ch -= 96;
     else ch = 95;
 #endif
+#ifdef LCD_FONT3x5
+  if( lcd_fontsize == 0 ){
+    #ifdef FULL_CP1251_TABLE
+      ch -= '0';
+    #else
+      ch -= ('0'-' ');
+    #endif
+    for( i = 0; i < 3; i++ ){
+      c = lcd_videobuf[LcdCacheIdx];
+      b1 = pgm_read_byte( &glyph3x5[(uint8_t)ch][i] );
+      switch(lcdtfdn){
+        case 1: c &= 0b11000001; c |= (b1<<1); break;
+        case 2: c &= 0b10000011; c |= (b1<<2); break;
+        case 3: c &= 0b00000111; c |= (b1<<3); break;
+        default: c &= 0b11100000; c |= b1;
+      }
+      lcd_videobuf[LcdCacheIdx++] = c;
+    }
+  }else
+#endif
   if( lcd_fontsize == 1 )
-    for( i = 0; i < 5; i++ )lcd_videobuf[LcdCacheIdx++] = pgm_read_byte( &glyph[(uint8_t)ch][i] ) << 1;
+    for( i = 0; i < 5; i++ )lcd_videobuf[LcdCacheIdx++] = pgm_read_byte( &glyph[(uint8_t)ch][i] );
   else{
     tmpIdx = LcdCacheIdx - 84;
     LCDLOWADDR(tmpIdx);
     if( tmpIdx < 0 ) return LCD_OUT;
     for( i = 0; i < 5; i++ ){
       // Копируем вид символа из таблицы у временную переменную
-      c = pgm_read_byte(&glyph[(uint8_t)ch][i]) << 1;
+      c = pgm_read_byte(&glyph[(uint8_t)ch][i]);
       //resize the image
       // Увеличиваем картинку
       asm volatile(
