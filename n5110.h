@@ -7,19 +7,6 @@
  *     - kobzar aka kobraz для http://cxem.net/ maodzedun@gmail.com
  *     - Alex для http://forum.cxem.net/
  *     - COKPOWEHEU для http://forum.cxem.net/
- *
- * Изменения  : 
- *     - Улучшена оптимизация
- *     - Иcправлена ошибка вывода больших float чисел.
- *	  SPI переведён на программный, для удобства определения выводов МК
- *     - Улучшена оптимизация, изменены имена и параметры функций
- *     - Добавлены настройки
- *        - выбор SPI, программный или аппаратный
- *        - выбор таблицы кодов CP1251, краткий или полный
- *        - возможность отключения работы с числами с плавающей точкой
- *     - Добавлена возможность работы с числами с фиксированной точкой (int32_t)
- *     - Изменен принцип работы Lcd_update(), теперь его надо вызывать с частотой не менее 500 Гц
- *       ради уменьшения объема кода и постоянного обновления экрана
  */
 /*
  * Description  :  Nokia 5110 LCD driver
@@ -49,13 +36,17 @@
 
 //usage full CP1251 table
 //хранение всех 256 символов таблицы CP1251
-//#define FULL_CP1251_TABLE
+#define FULL_CP1251_TABLE
+
+//usage tiny 3x5 font for numbers
+//использование маленького шрифта 3х5, только для цифр
+#define LCD_FONT3x5
 
 //disabling function working with float numbers (recommends)
 //отключение нерекомендуемой функции работы с плавающей точкой
 #define DISABLE_DOUBLE
 //отключение работы с графикой (точки, линии и прочее)
-//#define DISABLE_GRAPHICS
+#define DISABLE_GRAPHICS
 
 //update screen method
 //  LCD_CONTINUOUS - 1 byte per 1 call Lcd_update() function. It is smaller and process load is more uniform
@@ -90,7 +81,9 @@ void Lcd_init();   // Инициализация
 void Lcd_clear();   // Очистка буфера
 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 extern volatile unsigned char lcd_fontsize; //размер шрифта, 1 или 2 //font size, 1 or 2
+extern volatile unsigned char lcdtfdn; //lcd_tiny_font_down - сдвиг шрифта 3х5 относительно обычного
 inline void LcdSize(unsigned char size){lcd_fontsize = size;}
+inline void Lcd3x5shift(unsigned char sh){lcdtfdn = sh;}
 //обновление экрана. См. режимы работы
 void Lcd_update();
 void LcdContrast( uint8_t contrast );   // Установка контрастности дисплея
