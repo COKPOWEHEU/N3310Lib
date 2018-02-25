@@ -19,6 +19,9 @@ PROGMEM const uint8_t glyph[][5] = {
 };
 #ifdef LCD_FONT3x5
 PROGMEM const uint8_t glyph3x5[][3]={
+  {0b00100, 0b00100, 0b00100}, //-
+  {0b00000, 0b10000, 0b00000}, //dot
+  {0b11000, 0b01110, 0b00011}, //slash
   {0b11111, 0b10001, 0b11111}, //0
   {0b00000, 0b00000, 0b11111}, //1
   {0b11101, 0b10101, 0b10111}, //2
@@ -208,9 +211,9 @@ int8_t LcdChr( char ch ){
 #ifdef LCD_FONT3x5
   if( lcd_fontsize == 0 ){
     #ifdef FULL_CP1251_TABLE
-      ch -= '0';
+      ch -= '-';
     #else
-      ch -= ('0'-' ');
+      ch -= ('0'-'-');
     #endif
     for( i = 0; i < 3; i++ ){
       c = lcd_videobuf[LcdCacheIdx];
