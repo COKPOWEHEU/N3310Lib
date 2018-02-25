@@ -14,6 +14,13 @@ int main(){
   Lcd_putf(31415,4);
   Lcd_line(10,30,50,40,1);
   Lcd_circle(42,36,12,1);
+  LcdGotoXY(0,3);
+  LcdSize(0);
+  Lcd_puts("012");
+  Lcd3x5shift(1); Lcd_puts("34");
+  Lcd3x5shift(2); Lcd_puts("56");
+  Lcd3x5shift(3); Lcd_puts("789");
+  LcdSize(1);
   while(1){
     Lcd_update();
   }
